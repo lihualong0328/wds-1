@@ -16,11 +16,11 @@ int main(void)
 {
 	unsigned long i = 0;
 
-	GPFCON = GPF4_out|GPF5_out|GPF6_out;		// ��LED1-3��Ӧ��GPF4/5/6����������Ϊ���
+	GPFCON = GPF4_out|GPF5_out|GPF6_out;		// 将LED1-3对应的GPF4/5/6三个引脚设为输出
 
 	while(1){
 		wait(30000);
-		GPFDAT = (~(i<<4));	 	// ����i��ֵ������LED1-3
+		GPFDAT = (~(i<<4));	 	// 根据i的值，点亮LED1-3
 		if(++i == 8)
 			i = 0;
 	}
