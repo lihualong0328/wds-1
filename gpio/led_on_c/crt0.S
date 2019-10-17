@@ -10,7 +10,7 @@ _start:
             mov     r1, #0x0                     
             str     r1, [r0]            @ 关看门狗 : 写入0，禁止WATCHDOG，否则CPU会不断重启
             
-            ldr     sp, =1024*4         @ 设置堆栈，注意：不能大于4k, 因为现在可用的内存只有内部4k的ram
+            ldr     sp, =1024*4         @ 设置堆栈(满减栈)，注意：不能大于4k, 因为现在可用的内存只有内部4k的ram
                                         @ nand 中代码在复位后会移到内部ram中；注意: led_on_c.bin要小于4k, 否则4k的后半部分没有空间用于设置sp
             bl      main                @ 调用main，注意: bl跳转到main并把返回地址保存到lr寄存器
 halt_loop:
