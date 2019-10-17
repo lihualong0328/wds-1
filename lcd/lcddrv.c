@@ -85,8 +85,6 @@ void Tft_Lcd_Init(int type)
         LCDCON4 = HSPW_240320;
         LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | \
                   (BSWP<<1);
-//        LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | (VDEN_INV << 6) | \
-//                  (BSWP<<1);
 
         /*
          * 设置LCD控制器的地址寄存器LCDSADDR1~3
@@ -116,71 +114,6 @@ void Tft_Lcd_Init(int type)
         xsize = 240;
         ysize = 320;   
         break;
-
-    case MODE_TFT_8BIT_320240:
-        /* 
-         * 设置LCD控制器的控制寄存器LCDCON1~5
-         * 1. LCDCON1:
-         *    设置VCLK的频率：VCLK(Hz) = HCLK/[(CLKVAL+1)x2]
-         *    选择LCD类型: TFT LCD   
-         *    设置显示模式: 8BPP
-         *    先禁止LCD信号输出
-         * 2. LCDCON2/3/4:
-         *    设置控制信号的时间参数
-         *    设置分辨率，即行数及列数
-         * 现在，可以根据公式计算出显示器的频率：
-         * 当HCLK=100MHz时，
-         * Frame Rate = 1/[{(VSPW+1)+(VBPD+1)+(LIINEVAL+1)+(VFPD+1)}x
-         *              {(HSPW+1)+(HBPD+1)+(HFPD+1)+(HOZVAL+1)}x
-         *              {2x(CLKVAL+1)/(HCLK)}]
-         *            = 60Hz
-         * 3. LCDCON5:
-         *    设置显示模式为8BPP时，调色板中的数据格式: 5:6:5
-         *    设置HSYNC、VSYNC脉冲的极性(这需要参考具体LCD的接口信号): 反转
-         *    字节交换使能
-         */
-        LCDCON1 = (CLKVAL_TFT_320240<<8) | (LCDTYPE_TFT<<5) | \
-                  (BPPMODE_8BPP<<1) | (ENVID_DISABLE<<0);
-        LCDCON2 = (VBPD_320240<<24) | (LINEVAL_TFT_320240<<14) | \
-                  (VFPD_320240<<6) | (VSPW_320240);
-        LCDCON3 = (HBPD_320240<<19) | (HOZVAL_TFT_320240<<8) | (HFPD_320240);
-        LCDCON4 = HSPW_320240;
-//        LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | \
-//                  (BSWP<<1);
-        LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | (VDEN_INV << 6) | \
-                  (BSWP<<1);
-
-        /*
-         * 设置LCD控制器的地址寄存器LCDSADDR1~3
-         * 帧内存与视口(view point)完全吻合，
-         * 图像数据格式如下(8BPP时，帧缓冲区中的数据为调色板中的索引值)：
-         *         |----PAGEWIDTH----|
-         *    y/x  0   1   2       239
-         *     0   idx idx idx ... idx
-         *     1   idx idx idx ... idx
-         * 1. LCDSADDR1:
-         *    设置LCDBANK、LCDBASEU
-         * 2. LCDSADDR2:
-         *    设置LCDBASEL: 帧缓冲区的结束地址A[21:1]
-         * 3. LCDSADDR3:
-         *    OFFSIZE等于0，PAGEWIDTH等于(240/2)
-         */
-        LCDSADDR1 = ((LCDFRAMEBUFFER>>22)<<21) | LOWER21BITS(LCDFRAMEBUFFER>>1);
-        LCDSADDR2 = LOWER21BITS((LCDFRAMEBUFFER+ \
-                    (LINEVAL_TFT_320240+1)*(HOZVAL_TFT_320240+1)*1)>>1);
-        LCDSADDR3 = (0<<11) | (LCD_XSIZE_TFT_320240/2);
-
-        /* 禁止临时调色板寄存器 */
-        TPAL = 0;
-
-        fb_base_addr = LCDFRAMEBUFFER;
-        bpp = 8;
-        xsize = 320;
-        ysize = 240;
-        
-        break;
-
-        
     case MODE_TFT_16BIT_240320:
         /* 
          * 设置LCD控制器的控制寄存器LCDCON1~5
@@ -242,11 +175,115 @@ void Tft_Lcd_Init(int type)
         bpp = 16;
         xsize = 240;
         ysize = 320;
+        break;
+    case MODE_TFT_8BIT_320240:
+        LCDCON1 = (CLKVAL_TFT_320240<<8) | (LCDTYPE_TFT<<5) | \
+                  (BPPMODE_8BPP<<1) | (ENVID_DISABLE<<0);
+        LCDCON2 = (VBPD_320240<<24) | (LINEVAL_TFT_320240<<14) | \
+                  (VFPD_320240<<6) | (VSPW_320240);
+        LCDCON3 = (HBPD_320240<<19) | (HOZVAL_TFT_320240<<8) | (HFPD_320240);
+        LCDCON4 = HSPW_320240;
+        LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | (VDEN_INV << 6) | \
+                  (BSWP<<1);
 
+        LCDSADDR1 = ((LCDFRAMEBUFFER>>22)<<21) | LOWER21BITS(LCDFRAMEBUFFER>>1);
+        LCDSADDR2 = LOWER21BITS((LCDFRAMEBUFFER+ \
+                    (LINEVAL_TFT_320240+1)*(HOZVAL_TFT_320240+1)*1)>>1);
+        LCDSADDR3 = (0<<11) | (LCD_XSIZE_TFT_320240/2);
+
+        /* 禁止临时调色板寄存器 */
+        TPAL = 0;
+
+        fb_base_addr = LCDFRAMEBUFFER;
+        bpp = 8;
+        xsize = 320;
+        ysize = 240;
+        break;
+    case MODE_TFT_16BIT_320240:
+        LCDCON1 = (CLKVAL_TFT_320240<<8) | (LCDTYPE_TFT<<5) | \
+                  (BPPMODE_16BPP<<1) | (ENVID_DISABLE<<0);
+        LCDCON2 = (VBPD_320240<<24) | (LINEVAL_TFT_320240<<14) | \
+                  (VFPD_320240<<6) | (VSPW_320240);
+        LCDCON3 = (HBPD_320240<<19) | (HOZVAL_TFT_320240<<8) | (HFPD_320240);
+        LCDCON4 = HSPW_320240;
+	    LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | (VDEN_INV << 6) | \
+				(HWSWP<<0);
+
+        LCDSADDR1 = ((LCDFRAMEBUFFER>>22)<<21) | LOWER21BITS(LCDFRAMEBUFFER>>1);
+        LCDSADDR2 = LOWER21BITS((LCDFRAMEBUFFER+ \
+                    (LINEVAL_TFT_320240+1)*(HOZVAL_TFT_320240+1)*2)>>1);
+        LCDSADDR3 = (0<<11) | (LCD_XSIZE_TFT_320240*2/2);
+
+        /* 禁止临时调色板寄存器 */
+        TPAL = 0;
+
+        fb_base_addr = LCDFRAMEBUFFER;
+        bpp = 16;
+        xsize = 320;
+        ysize = 240;
+        break;
+    case MODE_TFT_8BIT_480272:
+        /* 
+         * 设置LCD控制器的控制寄存器LCDCON1~5
+         * 1. LCDCON1:
+         *    设置VCLK的频率：VCLK(Hz) = HCLK/[(CLKVAL+1)x2]
+         *    选择LCD类型: TFT LCD   
+         *    设置显示模式: 8BPP
+         *    先禁止LCD信号输出
+         * 2. LCDCON2/3/4:
+         *    设置控制信号的时间参数
+         *    设置分辨率，即行数及列数
+         * 现在，可以根据公式计算出显示器的频率：
+         * 当HCLK=100MHz时，
+         * Frame Rate = 1/[{(VSPW+1)+(VBPD+1)+(LIINEVAL+1)+(VFPD+1)}x
+         *              {(HSPW+1)+(HBPD+1)+(HFPD+1)+(HOZVAL+1)}x
+         *              {2x(CLKVAL+1)/(HCLK)}]
+         *            = 60Hz
+         * 3. LCDCON5:
+         *    设置显示模式为8BPP时，调色板中的数据格式: 5:6:5
+         *    设置HSYNC、VSYNC脉冲的极性(这需要参考具体LCD的接口信号): 反转
+         *    字节交换使能
+         */
+        LCDCON1 = (4<<8) | (LCDTYPE_TFT<<5) | \
+                  (BPPMODE_8BPP<<1) | (ENVID_DISABLE<<0);
+        LCDCON2 = (1<<24) | (271<<14) | \
+                  (1<<6) | (9);
+        LCDCON3 = (1<<19) | (479<<8) | (1);
+        LCDCON4 = 40;
+        LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | \
+                  (BSWP<<1);
+
+        /*
+         * 设置LCD控制器的地址寄存器LCDSADDR1~3
+         * 帧内存与视口(view point)完全吻合，
+         * 图像数据格式如下(8BPP时，帧缓冲区中的数据为调色板中的索引值)：
+         *         |----PAGEWIDTH----|
+         *    y/x  0   1   2       239
+         *     0   idx idx idx ... idx
+         *     1   idx idx idx ... idx
+         * 1. LCDSADDR1:
+         *    设置LCDBANK、LCDBASEU
+         * 2. LCDSADDR2:
+         *    设置LCDBASEL: 帧缓冲区的结束地址A[21:1]
+         * 3. LCDSADDR3:
+         *    OFFSIZE等于0，PAGEWIDTH等于(240/2)
+         */
+        LCDSADDR1 = ((LCDFRAMEBUFFER>>22)<<21) | LOWER21BITS(LCDFRAMEBUFFER>>1);
+        LCDSADDR2 = LOWER21BITS((LCDFRAMEBUFFER+ \
+                    (480)*(272)*1)>>1);
+        LCDSADDR3 = (0<<11) | (480/2);
+
+        /* 禁止临时调色板寄存器 */
+        TPAL = 0;
+
+        fb_base_addr = LCDFRAMEBUFFER;
+        bpp = 8;
+        xsize = 480;
+        ysize = 272;
+        
         break;
 
-
-    case MODE_TFT_16BIT_320240:
+    case MODE_TFT_16BIT_480272:
         /* 
          * 设置LCD控制器的控制寄存器LCDCON1~5
          * 1. LCDCON1:
@@ -268,16 +305,14 @@ void Tft_Lcd_Init(int type)
          *    设置HSYNC、VSYNC脉冲的极性(这需要参考具体LCD的接口信号): 反转
          *    半字(2字节)交换使能
          */
-        LCDCON1 = (CLKVAL_TFT_320240<<8) | (LCDTYPE_TFT<<5) | \
+        LCDCON1 = (4<<8) | (LCDTYPE_TFT<<5) | \
                   (BPPMODE_16BPP<<1) | (ENVID_DISABLE<<0);
-        LCDCON2 = (VBPD_320240<<24) | (LINEVAL_TFT_320240<<14) | \
-                  (VFPD_320240<<6) | (VSPW_320240);
-        LCDCON3 = (HBPD_320240<<19) | (HOZVAL_TFT_320240<<8) | (HFPD_320240);
-        LCDCON4 = HSPW_320240;
-//      LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | \
-//                (HWSWP<<1);
-	    LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | (VDEN_INV << 6) | \
-				(HWSWP<<0);
+        LCDCON2 = (1<<24) | (271<<14) | \
+                  (1<<6) | (9);
+        LCDCON3 = (1<<19) | (479<<8) | (1);
+        LCDCON4 = 40;
+        LCDCON5 = (FORMAT8BPP_565<<11) | (HSYNC_INV<<9) | (VSYNC_INV<<8) | \
+                  (HWSWP<<1);
 
         /*
          * 设置LCD控制器的地址寄存器LCDSADDR1~3
@@ -296,20 +331,18 @@ void Tft_Lcd_Init(int type)
          */
         LCDSADDR1 = ((LCDFRAMEBUFFER>>22)<<21) | LOWER21BITS(LCDFRAMEBUFFER>>1);
         LCDSADDR2 = LOWER21BITS((LCDFRAMEBUFFER+ \
-                    (LINEVAL_TFT_320240+1)*(HOZVAL_TFT_320240+1)*2)>>1);
-        LCDSADDR3 = (0<<11) | (LCD_XSIZE_TFT_320240*2/2);
+                    (480)*(272)*2)>>1);
+        LCDSADDR3 = (0<<11) | (480*2/2);
 
         /* 禁止临时调色板寄存器 */
         TPAL = 0;
 
         fb_base_addr = LCDFRAMEBUFFER;
         bpp = 16;
-        xsize = 320;
-        ysize = 240;
-
+        xsize = 480;
+        ysize = 272;
         break;
-
-        
+       
     case MODE_TFT_8BIT_640480:
         /* 
          * 设置LCD控制器的控制寄存器LCDCON1~5

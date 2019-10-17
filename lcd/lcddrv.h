@@ -42,6 +42,8 @@
 #define MODE_TFT_8BIT_240320 	 (0x4102)
 #define MODE_TFT_16BIT_240320    (0x4104)
 #define MODE_TFT_24BIT_240320    (0x4108)
+#define MODE_TFT_8BIT_480272 	 (0x410c)
+#define MODE_TFT_16BIT_480272    (0x4110)
 
 //TFT 240320
 #define LCD_XSIZE_TFT_240320 	(240)	
@@ -57,8 +59,7 @@
 
 //Timing parameter for LTS350Q1(SAMSUNG) 
 #if 0
-#define VBPD_240320		((6-1)&0xff)
-//#define VFPD_240320		((4-1)&0xff)
+#define VBPD_240320		((6-1)&0xff)	//#define VFPD_240320		((4-1)&0xff)
 #define VFPD_240320		((5-1)&0xff)
 #define VSPW_240320		((2-1) &0x3f)
 #define HBPD_240320		((11-1)&0x7f)
@@ -68,11 +69,11 @@
 #define VBPD_240320		((6-1)&0xff)
 #define VFPD_240320		((4-1)&0xff)
 #define VSPW_240320		((2-1) &0x3f)	//#define VSPW_240320		((1-1) &0x3f)
-
 #define HBPD_240320		((11-1)&0x7f)
 #define HFPD_240320		((2-1)&0xff)
 #define HSPW_240320		((1-1)&0xff)
 #endif
+
 
 /*********************************************/
 //TFT LCD Panel(320*240)
@@ -102,6 +103,7 @@
 #define HSPW_320240		((6-1)&0xff)
 
 /********************************************/
+
 
 //TFT LCD Panel(640*480)
 #define MODE_TFT_1BIT_640480     (0x4201)

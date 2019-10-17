@@ -14,6 +14,8 @@ int main()
         printf("\r\n##### Test TFT LCD #####\r\n");
         printf("[1] TFT240320 8Bit\n\r");
         printf("[2] TFT240320 16Bit\n\r");
+        printf("[3] TFT480272 8Bit\n\r");
+        printf("[4] TFT480272 16Bit\n\r");
         printf("Enter your selection: ");
 
         c = getc();
@@ -32,6 +34,17 @@ int main()
                 break;
             }
 
+            case '3':
+            {
+                Test_Lcd_Tft_8Bit_480272();
+                break;
+            }
+            
+            case '4':
+            {
+                Test_Lcd_Tft_16Bit_480272();
+                break;
+            }
             
             default: 
                 break;
