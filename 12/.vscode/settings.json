@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "FIRST_DRV.C": "cpp",
+        "FIRSTDRVTEST.C": "cpp",
+        "MYLEDS.C": "cpp",
+        "THIRD_DRV.C": "cpp",
+        "FIFTH_DRV.C": "cpp",
+        "SIXTH_DRV.C": "cpp"
+    }
+}
