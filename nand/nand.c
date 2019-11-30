@@ -219,8 +219,8 @@ static void s3c2440_write_addr_lp(unsigned int addr)
 	volatile unsigned char *p = (volatile unsigned char *)&s3c2440nand->NFADDR;
 	int col, page;
 
-	col = addr & NAND_BLOCK_MASK_LP;    // 4096 & 2047 = 0x1000 & 0x7ff = 0
-	page = addr / NAND_SECTOR_SIZE_LP;  // 4096 / 2048 = 2
+	col = addr & NAND_BLOCK_MASK_LP;    // 4096 & 2047 = 0x1000 & 0x7ff = 0; 页内哪个地址
+	page = addr / NAND_SECTOR_SIZE_LP;  // 4096 / 2048 = 2; 哪一页
 	
 	*p = col & 0xff;			/* Column Address A0~A7 */
 	for(i=0; i<10; i++);		// 延迟
